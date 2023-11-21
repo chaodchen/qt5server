@@ -12,7 +12,6 @@ class WebSocketModel(QObject):
     update_signal = pyqtSignal()
     def __init__(self, parent=None):
         super().__init__(parent)
-
         self.config_data = {
             "boss_name": 'unknown',
             "max_times": '9999',
@@ -30,7 +29,7 @@ class WebSocketModel(QObject):
         self.clients = []
 
     def listen(self, port):
-        address = QHostAddress.LocalHost
+        address = QHostAddress.Any
         if not self.server.listen(address, port):
             print("Failed to listen on port", port)
         else:
