@@ -3,10 +3,21 @@ from PyQt5.QtWebSockets import QWebSocket, QWebSocketServer
 from PyQt5.QtCore import QUrl, QObject, QTimer, pyqtSignal
 import sys, json
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox
+from PyQt5.QtWidgets import QApplication,QSpacerItem, QSizePolicy, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox, QHBoxLayout
 import xlwings as xw
 from xlwings.constants import VAlign, HAlign
 import datetime
+
+WEBSOCKET_PORT = 8080
+
+
+def get_local_ip():
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    if "192.168" in s.getsockname()[0]:
+        return s.getsockname()[0]
+    return ""
 
 class WebSocketModel(QObject):
     update_signal = pyqtSignal()
@@ -185,6 +196,14 @@ class Controller():
         else:
             self.logv("关闭机器人")
         pass
+
+    def openwx(self):
+        self.logv("打开wx")
+        pass
+
+    def openredp(self):
+        self.logv("打开红包")
+        pass
     
     def logv(self, msg):
         if self.logview is not None:
@@ -197,20 +216,16 @@ class Controller():
         self.logview = view
 
 class MainView(QWidget):
-    def __init__(self, controller):
-        super().__init__()
 
-
-        # Connect the update signal to the update_ui method
-        self.controller = controller
-
-        self.setWindowTitle("wx红包助手")
-
+    def create_views(self):
         # Create input widgets
         self.boss_name_edit = QLineEdit(self)
         self.max_times_edit = QLineEdit(self)
         self.check_timeout_edit = QLineEdit(self)
         self.friend_edit = QLineEdit(self)
+        self.status_text = QLabel("设备没有连接...")
+        self.myip = QLabel(get_local_ip()+":" + str(WEBSOCKET_PORT))
+
         self.is_multiple_checkbox = QCheckBox("翻倍模式", self)
         self.is_draw_checkbox = QCheckBox("一点庄吃", self)
 
@@ -220,6 +235,12 @@ class MainView(QWidget):
 
         self.save_button = QPushButton("保存配置", self)
         self.save_button.clicked.connect(self.controller.saveConfig)
+
+        self.open_wx = QPushButton("打开wx", self)
+        self.open_wx.clicked.connect(self.controller.openwx)
+
+        self.open_redp = QPushButton("打开红包", self)
+        self.open_redp.clicked.connect(self.controller.openredp)
 
         self.run_checkbox = QCheckBox("手动采集", self)
         self.run_checkbox.clicked.connect(self.controller.startRunning)
@@ -231,38 +252,67 @@ class MainView(QWidget):
         self.data_browser = QTextBrowser(self)
         self.controller.setLogView(self.data_browser)
 
+    def create_layouts(self):
         # Set up layout
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("庄家名字:"))
-        layout.addWidget(self.boss_name_edit)
-        layout.addWidget(QLabel("最大下注:"))
-        layout.addWidget(self.max_times_edit)
-        layout.addWidget(QLabel("机器人超时:"))
-        layout.addWidget(self.check_timeout_edit)
-        layout.addWidget(QLabel("自己人:"))
-        layout.addWidget(self.friend_edit)
-        layout.addWidget(self.is_multiple_checkbox)
-        layout.addWidget(self.is_draw_checkbox)
-        layout.addWidget(self.clear_button)
-        layout.addWidget(self.save_button)
-        layout.addWidget(self.run_checkbox)
-        layout.addWidget(self.roobot_checkbox)
-        layout.addWidget(self.data_browser)
-        # Create a timer to periodically update the UI
-        # self.timer = QTimer(self)
-        # self.timer.timeout.connect(self.update_ui)
-        # self.timer.start(1000)  # Update every 1000 milliseconds (1 second)
-        controller.model.update_signal.connect(self.update_ui)
+        main_layout = QVBoxLayout(self)
+        child_layout = QHBoxLayout(self)
+        main_layout.addLayout(child_layout)
 
-        # Connect textChanged signals to update_config_data method
+        right_layout = QVBoxLayout(self)
+        left_layout = QVBoxLayout(self)
+        child_layout.addLayout(right_layout)
+        child_layout.addLayout(left_layout)
+
+        right_layout.addWidget(QLabel("庄家名字:"))
+        right_layout.addWidget(self.boss_name_edit)
+        right_layout.addWidget(QLabel("最大下注:"))
+        right_layout.addWidget(self.max_times_edit)
+        right_layout.addWidget(QLabel("机器人超时:"))
+        right_layout.addWidget(self.check_timeout_edit)
+        right_layout.addWidget(QLabel("自己人:"))
+        right_layout.addWidget(self.friend_edit)
+        right_check_layout = QHBoxLayout(self)
+        
+        right_check_layout.addWidget(self.is_multiple_checkbox)
+        right_check_layout.addWidget(self.is_draw_checkbox)
+        right_layout.addLayout(right_check_layout)
+
+        left_layout.addWidget(self.data_browser)
+        
+
+        hbox1 = QHBoxLayout(self)
+        hbox1.addWidget(self.clear_button)
+        hbox1.addWidget(self.save_button)
+        left_layout.addLayout(hbox1)
+
+        hbox2 = QHBoxLayout(self)
+        hbox2.addWidget(self.open_wx)
+        hbox2.addWidget(self.open_redp)
+        left_layout.addLayout(hbox2)
+        
+        left_check_layout = QHBoxLayout(self)
+        left_check_layout.addWidget(self.run_checkbox)
+        left_check_layout.addWidget(self.roobot_checkbox)
+        left_layout.addLayout(left_check_layout)
+
+        foolt_layout = QHBoxLayout(self)
+        foolt_layout.addWidget(self.status_text)
+
+        spacer_item = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        foolt_layout.addItem(spacer_item)
+
+        foolt_layout.addWidget(self.myip)
+        main_layout.addLayout(foolt_layout)
+
+        
+    def bind_view_module(self):
+        self.controller.model.update_signal.connect(self.update_ui)
         self.boss_name_edit.textChanged.connect(lambda: self.update_config_data("boss_name", self.boss_name_edit.text()))
         self.max_times_edit.textChanged.connect(lambda: self.update_config_data("max_times", self.max_times_edit.text()))
         self.check_timeout_edit.textChanged.connect(lambda: self.update_config_data("check_timeout", self.check_timeout_edit.text()))
         self.friend_edit.textChanged.connect(lambda: self.update_config_data("friend", self.friend_edit.text()))
-
         self.is_multiple_checkbox.stateChanged.connect(lambda: self.update_config_data("is_multiple", self.is_multiple_checkbox.isChecked()))
         self.is_draw_checkbox.stateChanged.connect(lambda: self.update_config_data("is_draw", self.is_draw_checkbox.isChecked()))
-
         
     def update_ui(self):
             # Update UI with the latest config data
@@ -278,14 +328,26 @@ class MainView(QWidget):
         self.controller.model.config_data[key] = value
         # Emit the update signal to trigger UI update
         self.controller.model.update_signal.emit()
+   
+    def initall(self):
+        pass
 
+    def __init__(self, controller):
+        super().__init__()
+        self.controller = controller
+        self.setWindowTitle("wx红包助手")
+        self.create_views()
+        self.create_layouts()
+        self.bind_view_module()
         
+        self.initall()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     server = WebSocketModel()
     controller = Controller(server)
     view = MainView(controller)
-    server.listen(8080)
+    server.listen(WEBSOCKET_PORT)
     view.show()
     print("websocket启动")
     app.aboutToQuit.connect(server.quit_all)
