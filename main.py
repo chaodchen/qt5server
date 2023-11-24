@@ -3,7 +3,7 @@ from PyQt5.QtWebSockets import QWebSocket, QWebSocketServer
 from PyQt5.QtCore import QUrl, QObject, QTimer, pyqtSignal
 import sys, json
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QApplication,QSpacerItem, QSizePolicy, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox, QHBoxLayout
+from PyQt5.QtWidgets import QApplication,QSpacerItem, QSizePolicy, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox, QHBoxLayout, QTextEdit, QPlainTextEdit
 import xlwings as xw
 from xlwings.constants import VAlign, HAlign
 import datetime
@@ -219,14 +219,13 @@ class Controller():
         self.logview = view
 
 class MainView(QWidget):
-
     def create_views(self):
         # Create input widgets
         self.boss_name_edit = QLineEdit(self)
         self.max_times_edit = QLineEdit(self)
         self.check_timeout_edit = QLineEdit(self)
         self.friend_edit = QLineEdit(self)
-        self.status_text = QLabel("设备没有连接...")
+        self.status_text = QLabel("v 1.0.0")
         self.myip = QLabel(get_local_ip()+":" + str(WEBSOCKET_PORT))
 
         self.is_multiple_checkbox = QCheckBox("翻倍模式", self)
@@ -303,7 +302,6 @@ class MainView(QWidget):
 
         spacer_item = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         foolt_layout.addItem(spacer_item)
-
         foolt_layout.addWidget(self.myip)
         main_layout.addLayout(foolt_layout)
 
@@ -331,7 +329,6 @@ class MainView(QWidget):
         self.controller.model.config_data[key] = value
         # Emit the update signal to trigger UI update
         self.controller.model.update_signal.emit()
-   
     def initall(self):
         pass
 
