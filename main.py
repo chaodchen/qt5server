@@ -25,8 +25,8 @@ class WebSocketModel(QObject):
         super().__init__(parent)
         self.config_data = {
             "boss_name": 'unknown',
-            "max_times": '9999',
-            "check_timeout": '6',
+            "max_times": 9999,
+            "check_timeout": 6,
             "friend": '',
             "is_multiple": True,
             "is_draw": True,
@@ -47,10 +47,12 @@ class WebSocketModel(QObject):
             print("WebSocket server listening on port", port)
     
     def handle_new_connection(self):
+        # if len(self.clients) >= 1:
+        #     print("额外客户端连接.")
+        #     return
         client = self.server.nextPendingConnection()
         client.binaryMessageReceived.connect(self.handle_message)
         client.textMessageReceived.connect(self.handle_text_message)
-        
         client.disconnected.connect(self.handle_disconnect)
         self.clients.append(client)
         print("Client connected:", client.peerAddress().toString())
@@ -144,9 +146,9 @@ class WebSocketModel(QObject):
                 client.sendBinaryMessage(message)
     
     def handle_disconnect(self):
-
         sender = self.sender()
         print("Client disconnected:", sender.peerAddress().toString())
+        
         # self.clients.remove(sender)
     
     def quit_all(self):
@@ -199,18 +201,19 @@ class Controller():
 
     def openwx(self):
         self.logv("打开wx")
-        pass
+        message = {"code": 1, "call": "openWeChat", "data": ""}
+        self.sendMessageAll(message)
 
     def openredp(self):
         self.logv("打开红包")
-        pass
+        message = {"code": 1, "call": "openRedp", "data": ""}
+        self.sendMessageAll(message)
     
     def logv(self, msg):
         if self.logview is not None:
             self.logview.append("[{}] {}".format(
                                 datetime.datetime.now().strftime('%m-%d %H:%M'),
                                 msg))
-        pass
 
     def setLogView(self, view):
         self.logview = view
@@ -316,10 +319,10 @@ class MainView(QWidget):
         
     def update_ui(self):
             # Update UI with the latest config data
-            self.boss_name_edit.setText(self.controller.model.config_data["boss_name"])
-            self.max_times_edit.setText(self.controller.model.config_data["max_times"])
-            self.check_timeout_edit.setText(self.controller.model.config_data["check_timeout"])
-            self.friend_edit.setText(self.controller.model.config_data["friend"])
+            self.boss_name_edit.setText(str(self.controller.model.config_data["boss_name"]))
+            self.max_times_edit.setText(str(self.controller.model.config_data["max_times"]))
+            self.check_timeout_edit.setText(str(self.controller.model.config_data["check_timeout"]))
+            self.friend_edit.setText(str(self.controller.model.config_data["friend"]))
             self.is_multiple_checkbox.setChecked(self.controller.model.config_data["is_multiple"])
             self.is_draw_checkbox.setChecked(self.controller.model.config_data["is_draw"])
     
