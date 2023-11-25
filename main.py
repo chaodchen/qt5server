@@ -133,7 +133,10 @@ class WebSocketModel(QObject):
                     sheet.range('E'+str(row)).value = body_data[index]['redp']
                     sheet.range('F'+str(row)).value = body_data[index]['current_golds']
                     index += 1
-                pass
+                # 更新公式
+                tmp = "=SUM(A5:A"+str(index+5)+")"
+                sheet.range('A1').formula2=tmp
+                
         elif c_data['code'] == 2:
             pass
         print(c_data['call'])
@@ -305,7 +308,6 @@ class MainView(QWidget):
         foolt_layout.addWidget(self.myip)
         main_layout.addLayout(foolt_layout)
 
-        
     def bind_view_module(self):
         self.controller.model.update_signal.connect(self.update_ui)
         self.boss_name_edit.textChanged.connect(lambda: self.update_config_data("boss_name", self.boss_name_edit.text()))
