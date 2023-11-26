@@ -5,7 +5,6 @@ import sys, json
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QApplication,QSpacerItem, QSizePolicy, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox, QHBoxLayout, QTextEdit, QPlainTextEdit
 import xlwings as xw
-from xlwings.constants import VAlign, HAlign
 import datetime
 
 WEBSOCKET_PORT = 8080
@@ -69,10 +68,8 @@ class WebSocketModel(QObject):
                 self.update_signal.emit()
             if c_data['call'] == 'getGameDataCurrent':
                 sheet = self.book.sheets.add()
-
                 header_data = c_data['data']['header']
                 body_data = c_data['data']['body']
-                
                 sheet.range('A1:A3').merge()
                 sheet.range('A1').value = header_data['golds']
                 if header_data['golds'] >= 2000:
@@ -84,8 +81,14 @@ class WebSocketModel(QObject):
                 sheet.range('B2:C2').merge()
                 sheet.range('B3:C3').merge()
                 sheet.range('B1').value = '吃: ' + str(header_data['win'])
+                sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+
                 sheet.range('B2').value = '赔: ' + str(header_data['lose'])
+                sheet.range('B12').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+
                 sheet.range('B3').value = '平: ' + str(header_data['draw'])
+                sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+
                 sheet.range('B1:B3').color = (125,170,249)
 
                 sheet.range('D1:E1').merge()
