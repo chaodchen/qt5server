@@ -81,13 +81,13 @@ class WebSocketModel(QObject):
                 sheet.range('B2:C2').merge()
                 sheet.range('B3:C3').merge()
                 sheet.range('B1').value = '吃: ' + str(header_data['win'])
-                # sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 sheet.range('B2').value = '赔: ' + str(header_data['lose'])
-                # sheet.range('B12').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                sheet.range('B12').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 sheet.range('B3').value = '平: ' + str(header_data['draw'])
-                # sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 sheet.range('B1:B3').color = (125,170,249)
 
@@ -139,7 +139,7 @@ class WebSocketModel(QObject):
                     sheet.range('F'+str(row)).value = body_data[index]['current_golds']
                     temp_num -= body_data[index]['current_golds']
                     index += 1
-                print("temp_num_end: %d", temp_num)
+                print("temp_num_end: %s", str(temp_num))
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 sheet.range('A1').formula2=tmp
