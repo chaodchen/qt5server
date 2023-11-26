@@ -33,7 +33,7 @@ class WebSocketModel(QObject):
         self.excel = xw.App(visible=True,add_book=False)
         self.book = self.excel.books.add()
         self.sheet = None
-        
+        self.sheets = []
         self.logview = None
         self.count = 0
         self.server = QWebSocketServer("WebSocket Server", QWebSocketServer.NonSecureMode, parent)
@@ -70,6 +70,7 @@ class WebSocketModel(QObject):
                 self.update_signal.emit()
             if c_data['call'] == 'getGameDataCurrent':
                 self.sheet = self.book.sheets.add()
+                self.sheets.append(self.sheet)
                 header_data = c_data['data']['header']
                 body_data = c_data['data']['body']
                 self.sheet.range('A1:A3').merge()
@@ -147,8 +148,12 @@ class WebSocketModel(QObject):
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 self.sheet.range('A1').formula=tmp
                 self.sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+            if c_data['call'] == 'sendMessage':
+                print(c_data['data'])
                 
+                pass
         elif c_data['code'] == 2:
+            
             pass
         print(c_data['call'])
 
@@ -232,11 +237,15 @@ class Controller():
     def clearDataOne(self):
         self.logv("清空一把")
         message = {"code": 1, "call": "clearDataOne", "data": ""}
+        self.model.sheet.delete()
         self.sendMessageAll(message)
 
     def clearDataAll(self):
         self.logv("清空所有")
         message = {"code": 1, "call": "clearDataAll", "data": ""}
+        for sh in self.model.sheets:
+            if sh is not None:
+                sh.delete()
         self.sendMessageAll(message)
 
     def setLogView(self, view):
@@ -351,13 +360,13 @@ class MainView(QWidget):
         self.is_draw_checkbox.stateChanged.connect(lambda: self.update_config_data("is_draw", self.is_draw_checkbox.isChecked()))
         
     def update_ui(self):
-            # Update UI with the latest config data
-            self.boss_name_edit.setText(str(self.controller.model.config_data["boss_name"]))
-            self.max_times_edit.setText(str(self.controller.model.config_data["max_times"]))
-            self.check_timeout_edit.setText(str(self.controller.model.config_data["check_timeout"]))
-            self.friend_edit.setText(str(self.controller.model.config_data["friend"]))
-            self.is_multiple_checkbox.setChecked(self.controller.model.config_data["is_multiple"])
-            self.is_draw_checkbox.setChecked(self.controller.model.config_data["is_draw"])
+        # Update UI with the latest config data
+        self.boss_name_edit.setText(str(self.controller.model.config_data["boss_name"]))
+        self.max_times_edit.setText(str(self.controller.model.config_data["max_times"]))
+        self.check_timeout_edit.setText(str(self.controller.model.config_data["check_timeout"]))
+        self.friend_edit.setText(str(self.controller.model.config_data["friend"]))
+        self.is_multiple_checkbox.setChecked(self.controller.model.config_data["is_multiple"])
+        self.is_draw_checkbox.setChecked(self.controller.model.config_data["is_draw"])
     
     def update_config_data(self, key, value):
         # Update the corresponding value in config_data
