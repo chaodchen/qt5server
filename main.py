@@ -143,8 +143,9 @@ class WebSocketModel(QObject):
                 print("temp_num_end: %s", str(temp_num))
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
+                print("公式: %s", tmp)
                 sheet.range('A1').formula=tmp
-                sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
                 
         elif c_data['code'] == 2:
             pass
