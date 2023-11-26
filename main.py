@@ -138,6 +138,15 @@ class WebSocketModel(QObject):
                         self.sheet.range('A'+str(row)).color = (238,0,0)
                     self.sheet.range('B'+str(row)+':C'+str(row)).merge()
                     self.sheet.range('B'+str(row)).value = body_data[index]['name']
+
+                    # self.sheet.range('B'+str(row)).api.Font.Color = (142, 124, 195)
+                    if body_data[index]['isfake']:
+                        self.sheet.range('B'+str(row)).api.Font.Color = (255, 153, 0)
+                    if body_data[index]['islazy']:
+                        self.sheet.range('B'+str(row)).api.Font.Color = (74, 134, 232)
+                    if body_data[index]['isbug']:
+                        self.sheet.range('B'+str(row)).api.Font.Color = (153, 0, 255)
+                    
                     self.sheet.range('D'+str(row)).value = body_data[index]['chat']
                     self.sheet.range('E'+str(row)).value = body_data[index]['redp']
                     self.sheet.range('F'+str(row)).value = body_data[index]['current_golds']
