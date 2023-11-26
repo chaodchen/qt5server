@@ -84,7 +84,7 @@ class WebSocketModel(QObject):
                 sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 sheet.range('B2').value = '赔: ' + str(header_data['lose'])
-                sheet.range('B12').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 sheet.range('B3').value = '平: ' + str(header_data['draw'])
                 sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
@@ -121,6 +121,7 @@ class WebSocketModel(QObject):
                 sheet.range('E4').value = '红包点数'
                 sheet.range('F4').value = '本局结算'
                 sheet.range('G4').value = '收付款'
+
                 
                 index = 0
                 temp_num = header_data['golds']
@@ -143,6 +144,7 @@ class WebSocketModel(QObject):
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 sheet.range('A1').formula2=tmp
+                sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
                 
         elif c_data['code'] == 2:
             pass
