@@ -10,6 +10,3 @@ wb = app.books.open("test.xlsx")
 sheet = wb.sheets[0]
 sheet.range('A1').value  = "hahah"
 sheet.range('A1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
-
-# wb.close()
-# app.quit()

@@ -123,6 +123,8 @@ class WebSocketModel(QObject):
                 sheet.range('G4').value = '收付款'
                 
                 index = 0
+                temp_num = header_data['golds']
+                print("temp_num: %d", temp_num)
                 while index < len(body_data):
                     row = index+5
                     sheet.range('A'+str(row)).value = body_data[index]['golds']
@@ -135,9 +137,11 @@ class WebSocketModel(QObject):
                     sheet.range('D'+str(row)).value = body_data[index]['chat']
                     sheet.range('E'+str(row)).value = body_data[index]['redp']
                     sheet.range('F'+str(row)).value = body_data[index]['current_golds']
+                    temp_num -= body_data[index]['current_golds']
                     index += 1
+                print("temp_num_end: %d", temp_num)
                 # 更新公式
-                tmp = "=SUM(A5:A"+str(index+5)+")"
+                tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 sheet.range('A1').formula2=tmp
                 
         elif c_data['code'] == 2:
