@@ -32,6 +32,8 @@ class WebSocketModel(QObject):
         }
         self.excel = xw.App(visible=True,add_book=False)
         self.book = self.excel.books.add()
+        self.sheet = None
+        
         self.logview = None
         self.count = 0
         self.server = QWebSocketServer("WebSocket Server", QWebSocketServer.NonSecureMode, parent)
@@ -67,60 +69,60 @@ class WebSocketModel(QObject):
                 self.config_data.update(c_data['data'])
                 self.update_signal.emit()
             if c_data['call'] == 'getGameDataCurrent':
-                sheet = self.book.sheets.add()
+                self.sheet = self.book.sheets.add()
                 header_data = c_data['data']['header']
                 body_data = c_data['data']['body']
-                sheet.range('A1:A3').merge()
-                sheet.range('A1').value = header_data['golds']
+                self.sheet.range('A1:A3').merge()
+                self.sheet.range('A1').value = header_data['golds']
                 if header_data['golds'] >= 2000:
-                    sheet.range('A1').color = (0,238,0)
+                    self.sheet.range('A1').color = (0,238,0)
                 elif header_data['golds'] <= -2000:
-                    sheet.range('A1').color = (238,0,0)
+                    self.sheet.range('A1').color = (238,0,0)
 
-                sheet.range('B1:C1').merge()
-                sheet.range('B2:C2').merge()
-                sheet.range('B3:C3').merge()
-                sheet.range('B1').value = '吃: ' + str(header_data['win'])
-                sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                self.sheet.range('B1:C1').merge()
+                self.sheet.range('B2:C2').merge()
+                self.sheet.range('B3:C3').merge()
+                self.sheet.range('B1').value = '吃: ' + str(header_data['win'])
+                self.sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
-                sheet.range('B2').value = '赔: ' + str(header_data['lose'])
-                sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                self.sheet.range('B2').value = '赔: ' + str(header_data['lose'])
+                self.sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
-                sheet.range('B3').value = '平: ' + str(header_data['draw'])
-                sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                self.sheet.range('B3').value = '平: ' + str(header_data['draw'])
+                self.sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
-                sheet.range('B1:B3').color = (125,170,249)
+                self.sheet.range('B1:B3').color = (125,170,249)
 
-                sheet.range('D1:E1').merge()
-                sheet.range('D2:E2').merge()
-                sheet.range('D3:E3').merge()
-                sheet.range('D1').value = '本局次数: ' + str(header_data['current_count'])
-                sheet.range('D1').color = (238,212,236)
-                sheet.range('D2').value = '本局押注总计: ' + str(header_data['stake_count'])
-                sheet.range('D2').color = (254,247,207)
-                sheet.range('D3').value = '庄家本局结算: ' + str(header_data['stake_golds'])
-                sheet.range('D3').color = (228,252,200)
+                self.sheet.range('D1:E1').merge()
+                self.sheet.range('D2:E2').merge()
+                self.sheet.range('D3:E3').merge()
+                self.sheet.range('D1').value = '本局次数: ' + str(header_data['current_count'])
+                self.sheet.range('D1').color = (238,212,236)
+                self.sheet.range('D2').value = '本局押注总计: ' + str(header_data['stake_count'])
+                self.sheet.range('D2').color = (254,247,207)
+                self.sheet.range('D3').value = '庄家本局结算: ' + str(header_data['stake_golds'])
+                self.sheet.range('D3').color = (228,252,200)
                 
-                sheet.range('F1:G1').merge()
-                sheet.range('F2:G2').merge()
-                sheet.range('F3:G3').merge()
-                sheet.range('F1').value = '押注上限: ' + str(header_data['max_times'])
-                sheet.range('F1').color = (169,225,170)
+                self.sheet.range('F1:G1').merge()
+                self.sheet.range('F2:G2').merge()
+                self.sheet.range('F3:G3').merge()
+                self.sheet.range('F1').value = '押注上限: ' + str(header_data['max_times'])
+                self.sheet.range('F1').color = (169,225,170)
 
-                sheet.range('F2').value = '庄家姓名: ' + str(header_data['name'])
-                sheet.range('F2').color = (212,186,227)
-                sheet.range('F3').value = '庄家红包: ' + str(header_data['redp'])
-                sheet.range('F3').color = (199,161,237)
+                self.sheet.range('F2').value = '庄家姓名: ' + str(header_data['name'])
+                self.sheet.range('F2').color = (212,186,227)
+                self.sheet.range('F3').value = '庄家红包: ' + str(header_data['redp'])
+                self.sheet.range('F3').color = (199,161,237)
 
-                sheet.range('A4').value = '总单'
-                sheet.range('A4:G4').color = (178, 178, 178)
+                self.sheet.range('A4').value = '总单'
+                self.sheet.range('A4:G4').color = (178, 178, 178)
 
-                sheet.range('B4:C4').merge()
-                sheet.range('B4').value = '参与人名'
-                sheet.range('D4').value = '押注/收'
-                sheet.range('E4').value = '红包点数'
-                sheet.range('F4').value = '本局结算'
-                sheet.range('G4').value = '收付款'
+                self.sheet.range('B4:C4').merge()
+                self.sheet.range('B4').value = '参与人名'
+                self.sheet.range('D4').value = '押注/收'
+                self.sheet.range('E4').value = '红包点数'
+                self.sheet.range('F4').value = '本局结算'
+                self.sheet.range('G4').value = '收付款'
 
                 
                 index = 0
@@ -128,23 +130,23 @@ class WebSocketModel(QObject):
                 print("temp_num: %d", temp_num)
                 while index < len(body_data):
                     row = index+5
-                    sheet.range('A'+str(row)).value = body_data[index]['golds']
+                    self.sheet.range('A'+str(row)).value = body_data[index]['golds']
                     if body_data[index]['golds'] >= 2000:
-                        sheet.range('A'+str(row)).color = (0,238,0)
+                        self.sheet.range('A'+str(row)).color = (0,238,0)
                     elif body_data[index]['golds'] <= -2000:
-                        sheet.range('A'+str(row)).color = (238,0,0)
-                    sheet.range('B'+str(row)+':C'+str(row)).merge()
-                    sheet.range('B'+str(row)).value = body_data[index]['name']
-                    sheet.range('D'+str(row)).value = body_data[index]['chat']
-                    sheet.range('E'+str(row)).value = body_data[index]['redp']
-                    sheet.range('F'+str(row)).value = body_data[index]['current_golds']
+                        self.sheet.range('A'+str(row)).color = (238,0,0)
+                    self.sheet.range('B'+str(row)+':C'+str(row)).merge()
+                    self.sheet.range('B'+str(row)).value = body_data[index]['name']
+                    self.sheet.range('D'+str(row)).value = body_data[index]['chat']
+                    self.sheet.range('E'+str(row)).value = body_data[index]['redp']
+                    self.sheet.range('F'+str(row)).value = body_data[index]['current_golds']
                     temp_num -= body_data[index]['current_golds']
                     index += 1
                 print("temp_num_end: %s", str(temp_num))
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
-                sheet.range('A1').formula=tmp
-                sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                self.sheet.range('A1').formula=tmp
+                self.sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
                 
         elif c_data['code'] == 2:
             pass
@@ -226,6 +228,16 @@ class Controller():
             self.logview.append("[{}] {}".format(
                                 datetime.datetime.now().strftime('%m-%d %H:%M'),
                                 msg))
+    
+    def clearDataOne(self):
+        self.logv("清空一把")
+        message = {"code": 1, "call": "clearDataOne", "data": ""}
+        self.sendMessageAll(message)
+
+    def clearDataAll(self):
+        self.logv("清空所有")
+        message = {"code": 1, "call": "clearDataAll", "data": ""}
+        self.sendMessageAll(message)
 
     def setLogView(self, view):
         self.logview = view
@@ -249,6 +261,13 @@ class MainView(QWidget):
 
         self.save_button = QPushButton("保存配置", self)
         self.save_button.clicked.connect(self.controller.saveConfig)
+
+
+        self.clear_data_one = QPushButton("清空一把", self)
+        self.clear_data_one.clicked.connect(self.controller.clearDataOne)
+
+        self.clear_data_all = QPushButton("清空所有", self)
+        self.clear_data_all.clicked.connect(self.controller.clearDataAll)
 
         self.open_wx = QPushButton("打开wx", self)
         self.open_wx.clicked.connect(self.controller.openwx)
@@ -303,6 +322,11 @@ class MainView(QWidget):
         hbox2.addWidget(self.open_wx)
         hbox2.addWidget(self.open_redp)
         left_layout.addLayout(hbox2)
+
+        hbox3 = QHBoxLayout(self)
+        hbox3.addWidget(self.clear_data_one)
+        hbox3.addWidget(self.clear_data_all)
+        left_layout.addLayout(hbox3)
         
         left_check_layout = QHBoxLayout(self)
         left_check_layout.addWidget(self.run_checkbox)
