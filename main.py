@@ -145,11 +145,11 @@ class WebSocketModel(QObject):
 
                     # self.sheet.range('B'+str(row)).api.Font.Color = (142, 124, 195)
                     if body_data[index]['isfake']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = (255, 153, 0)
+                        self.sheet.range('B'+str(row)).api.Font.Color = 0xff0000
                     if body_data[index]['islazy']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = (74, 134, 232)
+                        self.sheet.range('B'+str(row)).api.Font.Color = 0x00ff00
                     if body_data[index]['isbug']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = (153, 0, 255)
+                        self.sheet.range('B'+str(row)).api.Font.Color = 0x0000ff
                     
                     self.sheet.range('D'+str(row)).value = body_data[index]['chat']
                     self.sheet.range('E'+str(row)).value = body_data[index]['redp']
@@ -161,7 +161,7 @@ class WebSocketModel(QObject):
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 self.sheet.range('A1').formula=tmp
-                self.sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                self.sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
             if c_data['call'] == 'sendMessage':
                 print(c_data['data'])
                 
