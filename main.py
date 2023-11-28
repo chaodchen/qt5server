@@ -36,6 +36,7 @@ class WebSocketModel(QObject):
         self.sheets = []
         self.logview = None
         self.count = 0
+        self.lastrow = 0
         self.server = QWebSocketServer("WebSocket Server", QWebSocketServer.NonSecureMode, parent)
         self.server.newConnection.connect(self.handle_new_connection)
         self.clients = []
@@ -125,6 +126,9 @@ class WebSocketModel(QObject):
                 self.sheet.range('F4').value = '本局结算'
                 self.sheet.range('G4').value = '收付款'
 
+                # header A1:G4
+                # header A5:??
+
                 
                 index = 0
                 temp_num = header_data['golds']
@@ -153,6 +157,7 @@ class WebSocketModel(QObject):
                     temp_num -= body_data[index]['current_golds']
                     index += 1
                 print("temp_num_end: %s", str(temp_num))
+                self.lastrow = index+5
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
                 self.sheet.range('A1').formula=tmp
@@ -165,6 +170,14 @@ class WebSocketModel(QObject):
             
             pass
         print(c_data['call'])
+    
+    def makeExcelData(self):
+        if self.sheet is None:
+            return ""
+        return {
+            "header": self.sheet.range("A1:G4").value,
+            "list": self.sheet.range("A5:G"+str(self.lastrow)).value,
+        }
 
     def handle_message(self, message):
         sender = self.sender()
@@ -237,6 +250,13 @@ class Controller():
         message = {"code": 1, "call": "openRedp", "data": ""}
         self.sendMessageAll(message)
     
+    def pushdata(self):
+        self.logv("推送数据")
+        pdata = self.model.makeExcelData()
+        print(pdata)
+        message = {"code": 1, "call": "pushData", "data": pdata}
+        self.sendMessageAll(message)
+        
     def logv(self, msg):
         if self.logview is not None:
             self.logview.append("[{}] {}".format(
@@ -293,6 +313,9 @@ class MainView(QWidget):
         self.open_redp = QPushButton("打开红包", self)
         self.open_redp.clicked.connect(self.controller.openredp)
 
+        self.push_data = QPushButton("推送数据", self)
+        self.push_data.clicked.connect(self.controller.pushdata)
+
         self.run_checkbox = QCheckBox("手动采集", self)
         self.run_checkbox.clicked.connect(self.controller.startRunning)
 
@@ -340,6 +363,7 @@ class MainView(QWidget):
         hbox2.addWidget(self.open_wx)
         hbox2.addWidget(self.open_redp)
         left_layout.addLayout(hbox2)
+        left_layout.addWidget(self.push_data)
 
         hbox3 = QHBoxLayout(self)
         hbox3.addWidget(self.clear_data_one)
