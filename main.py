@@ -154,12 +154,14 @@ class WebSocketModel(QObject):
                     self.sheet.range('D'+str(row)).value = body_data[index]['chat']
                     self.sheet.range('E'+str(row)).value = body_data[index]['redp']
                     self.sheet.range('F'+str(row)).value = body_data[index]['current_golds']
-                    temp_num -= body_data[index]['current_golds']
+                    # temp_num -= body_data[index]['current_golds']
                     index += 1
+                temp_num -= header_data['stake_golds']
                 print("temp_num_end: %s", str(temp_num))
                 self.lastrow = index+5
                 # 更新公式
                 tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
+                print("公式: %s" %tmp)
                 self.sheet.range('A1').formula=tmp
                 self.sheet.range('A5:'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
             if c_data['call'] == 'sendMessage':
