@@ -160,7 +160,7 @@ class WebSocketModel(QObject):
                 print("temp_num_end: %s", str(temp_num))
                 self.lastrow = index+5
                 # 更新公式
-                tmp = "=SUM(F5:F"+str(index+5)+")+"+str(temp_num)
+                tmp = "=SUM(F5:F"+str(index+5-1)+")+"+str(temp_num)
                 print("公式: %s" %tmp)
                 self.sheet.range('A1').formula=tmp
                 self.sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
