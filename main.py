@@ -6,9 +6,16 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QApplication,QSpacerItem, QSizePolicy, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QCheckBox, QHBoxLayout, QTextEdit, QPlainTextEdit
 import xlwings as xw
 import datetime
+import platform
 
 WEBSOCKET_PORT = 8080
 
+
+def check_platform():
+    if platform.system() == "Windows":
+        return True
+    else:
+        return False
 
 def get_local_ip():
     import socket
@@ -85,13 +92,14 @@ class WebSocketModel(QObject):
                 self.sheet.range('B2:C2').merge()
                 self.sheet.range('B3:C3').merge()
                 self.sheet.range('B1').value = '吃: ' + str(header_data['win'])
-                self.sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 self.sheet.range('B2').value = '赔: ' + str(header_data['lose'])
-                self.sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 self.sheet.range('B3').value = '平: ' + str(header_data['draw'])
-                self.sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                if check_platform():
+                    self.sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                    self.sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                    self.sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
                 self.sheet.range('B1:B3').color = (125,170,249)
 
@@ -143,13 +151,13 @@ class WebSocketModel(QObject):
                     self.sheet.range('B'+str(row)+':C'+str(row)).merge()
                     self.sheet.range('B'+str(row)).value = body_data[index]['name']
 
-                    # self.sheet.range('B'+str(row)).api.Font.Color = (142, 124, 195)
-                    if body_data[index]['isfake']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = 0xff0000
-                    if body_data[index]['islazy']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = 0x00ff00
-                    if body_data[index]['isbug']:
-                        self.sheet.range('B'+str(row)).api.Font.Color = 0x0000ff
+                    if check_platform():
+                        if body_data[index]['isfake']:
+                            self.sheet.range('B'+str(row)).api.Font.Color = 0xff0000
+                        if body_data[index]['islazy']:
+                            self.sheet.range('B'+str(row)).api.Font.Color = 0x00ff00
+                        if body_data[index]['isbug']:
+                            self.sheet.range('B'+str(row)).api.Font.Color = 0x0000ff
                     
                     self.sheet.range('D'+str(row)).value = body_data[index]['chat']
                     self.sheet.range('E'+str(row)).value = body_data[index]['redp']
@@ -163,7 +171,8 @@ class WebSocketModel(QObject):
                 tmp = "=0-SUM(F5:F"+str(index+5-1)+")+"+str(temp_num)
                 print("公式: %s" %tmp)
                 self.sheet.range('A1').formula=tmp
-                self.sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
+                if check_platform():
+                    self.sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
             if c_data['call'] == 'sendMessage':
                 print(c_data['data'])
                 
