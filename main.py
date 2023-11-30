@@ -110,7 +110,7 @@ class WebSocketModel(QObject):
                 self.sheet.range('D1').color = (238,212,236)
                 self.sheet.range('D2').value = '本局押注总计: ' + str(header_data['stake_count'])
                 self.sheet.range('D2').color = (254,247,207)
-                self.sheet.range('D3').value = '庄家本局结算: ' + str(header_data['stake_golds'])
+                self.sheet.range('D3').value = '庄家本局结算: ' + str(header_data['current_golds'])
                 self.sheet.range('D3').color = (228,252,200)
                 
                 self.sheet.range('F1:G1').merge()
@@ -164,7 +164,7 @@ class WebSocketModel(QObject):
                     self.sheet.range('F'+str(row)).value = body_data[index]['current_golds']
                     # temp_num -= body_data[index]['current_golds']
                     index += 1
-                temp_num -= header_data['stake_golds']
+                temp_num -= header_data['current_golds']
                 print("temp_num_end: %s", str(temp_num))
                 self.lastrow = index+5
                 # 更新公式
