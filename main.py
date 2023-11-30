@@ -39,7 +39,6 @@ class WebSocketModel(QObject):
         }
         self.excel = xw.App(visible=True,add_book=False)
         self.book = self.excel.books.add()
-        self.sheet = None
         self.sheets = []
         self.logview = None
         self.count = 0
@@ -77,62 +76,61 @@ class WebSocketModel(QObject):
                 self.config_data.update(c_data['data'])
                 self.update_signal.emit()
             if c_data['call'] == 'getGameDataCurrent':
-                self.sheet = self.book.sheets.add()
-                self.sheets.append(self.sheet)
+                self.sheets.append(self.book.sheets.add())
                 header_data = c_data['data']['header']
                 body_data = c_data['data']['body']
-                self.sheet.range('A1:A3').merge()
-                self.sheet.range('A1').value = header_data['golds']
+                self.sheets[-1].range('A1:A3').merge()
+                self.sheets[-1].range('A1').value = header_data['golds']
                 if header_data['golds'] >= 2000:
-                    self.sheet.range('A1').color = (0,238,0)
+                    self.sheets[-1].range('A1').color = (0,238,0)
                 elif header_data['golds'] <= -2000:
-                    self.sheet.range('A1').color = (238,0,0)
+                    self.sheets[-1].range('A1').color = (238,0,0)
 
-                self.sheet.range('B1:C1').merge()
-                self.sheet.range('B2:C2').merge()
-                self.sheet.range('B3:C3').merge()
-                self.sheet.range('B1').value = '吃: ' + str(header_data['win'])
+                self.sheets[-1].range('B1:C1').merge()
+                self.sheets[-1].range('B2:C2').merge()
+                self.sheets[-1].range('B3:C3').merge()
+                self.sheets[-1].range('B1').value = '吃: ' + str(header_data['win'])
 
-                self.sheet.range('B2').value = '赔: ' + str(header_data['lose'])
+                self.sheets[-1].range('B2').value = '赔: ' + str(header_data['lose'])
 
-                self.sheet.range('B3').value = '平: ' + str(header_data['draw'])
+                self.sheets[-1].range('B3').value = '平: ' + str(header_data['draw'])
                 if check_platform():
-                    self.sheet.range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
-                    self.sheet.range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
-                    self.sheet.range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                    self.sheets[-1].range('B1').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                    self.sheets[-1].range('B2').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
+                    self.sheets[-1].range('B3').api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter 
 
-                self.sheet.range('B1:B3').color = (125,170,249)
+                self.sheets[-1].range('B1:B3').color = (125,170,249)
 
-                self.sheet.range('D1:E1').merge()
-                self.sheet.range('D2:E2').merge()
-                self.sheet.range('D3:E3').merge()
-                self.sheet.range('D1').value = '本局次数: ' + str(header_data['current_count'])
-                self.sheet.range('D1').color = (238,212,236)
-                self.sheet.range('D2').value = '本局押注总计: ' + str(header_data['stake_count'])
-                self.sheet.range('D2').color = (254,247,207)
-                self.sheet.range('D3').value = '庄家本局结算: ' + str(header_data['current_golds'])
-                self.sheet.range('D3').color = (228,252,200)
+                self.sheets[-1].range('D1:E1').merge()
+                self.sheets[-1].range('D2:E2').merge()
+                self.sheets[-1].range('D3:E3').merge()
+                self.sheets[-1].range('D1').value = '本局次数: ' + str(header_data['current_count'])
+                self.sheets[-1].range('D1').color = (238,212,236)
+                self.sheets[-1].range('D2').value = '本局押注总计: ' + str(header_data['stake_count'])
+                self.sheets[-1].range('D2').color = (254,247,207)
+                self.sheets[-1].range('D3').value = '庄家本局结算: ' + str(header_data['current_golds'])
+                self.sheets[-1].range('D3').color = (228,252,200)
                 
-                self.sheet.range('F1:G1').merge()
-                self.sheet.range('F2:G2').merge()
-                self.sheet.range('F3:G3').merge()
-                self.sheet.range('F1').value = '押注上限: ' + str(header_data['max_times'])
-                self.sheet.range('F1').color = (169,225,170)
+                self.sheets[-1].range('F1:G1').merge()
+                self.sheets[-1].range('F2:G2').merge()
+                self.sheets[-1].range('F3:G3').merge()
+                self.sheets[-1].range('F1').value = '押注上限: ' + str(header_data['max_times'])
+                self.sheets[-1].range('F1').color = (169,225,170)
 
-                self.sheet.range('F2').value = '庄家姓名: ' + str(header_data['name'])
-                self.sheet.range('F2').color = (212,186,227)
-                self.sheet.range('F3').value = '庄家红包: ' + str(header_data['redp'])
-                self.sheet.range('F3').color = (199,161,237)
+                self.sheets[-1].range('F2').value = '庄家姓名: ' + str(header_data['name'])
+                self.sheets[-1].range('F2').color = (212,186,227)
+                self.sheets[-1].range('F3').value = '庄家红包: ' + str(header_data['redp'])
+                self.sheets[-1].range('F3').color = (199,161,237)
 
-                self.sheet.range('A4').value = '总单'
-                self.sheet.range('A4:G4').color = (178, 178, 178)
+                self.sheets[-1].range('A4').value = '总单'
+                self.sheets[-1].range('A4:G4').color = (178, 178, 178)
 
-                self.sheet.range('B4:C4').merge()
-                self.sheet.range('B4').value = '参与人名'
-                self.sheet.range('D4').value = '押注/收'
-                self.sheet.range('E4').value = '红包点数'
-                self.sheet.range('F4').value = '本局结算'
-                self.sheet.range('G4').value = '收付款'
+                self.sheets[-1].range('B4:C4').merge()
+                self.sheets[-1].range('B4').value = '参与人名'
+                self.sheets[-1].range('D4').value = '押注/收'
+                self.sheets[-1].range('E4').value = '红包点数'
+                self.sheets[-1].range('F4').value = '本局结算'
+                self.sheets[-1].range('G4').value = '收付款'
 
                 # header A1:G4
                 # header A5:??
@@ -143,25 +141,25 @@ class WebSocketModel(QObject):
                 print("temp_num: %d", temp_num)
                 while index < len(body_data):
                     row = index+5
-                    self.sheet.range('A'+str(row)).value = body_data[index]['golds']
+                    self.sheets[-1].range('A'+str(row)).value = body_data[index]['golds']
                     if body_data[index]['golds'] >= 2000:
-                        self.sheet.range('A'+str(row)).color = (0,238,0)
+                        self.sheets[-1].range('A'+str(row)).color = (0,238,0)
                     elif body_data[index]['golds'] <= -2000:
-                        self.sheet.range('A'+str(row)).color = (238,0,0)
-                    self.sheet.range('B'+str(row)+':C'+str(row)).merge()
-                    self.sheet.range('B'+str(row)).value = body_data[index]['name']
+                        self.sheets[-1].range('A'+str(row)).color = (238,0,0)
+                    self.sheets[-1].range('B'+str(row)+':C'+str(row)).merge()
+                    self.sheets[-1].range('B'+str(row)).value = body_data[index]['name']
 
                     if check_platform():
                         if body_data[index]['isfake']:
-                            self.sheet.range('B'+str(row)).api.Font.Color = 0xff0000
+                            self.sheets[-1].range('B'+str(row)).api.Font.Color = 0xff0000
                         if body_data[index]['islazy']:
-                            self.sheet.range('B'+str(row)).api.Font.Color = 0x00ff00
+                            self.sheets[-1].range('B'+str(row)).api.Font.Color = 0x00ff00
                         if body_data[index]['isbug']:
-                            self.sheet.range('B'+str(row)).api.Font.Color = 0x0000ff
+                            self.sheets[-1].range('B'+str(row)).api.Font.Color = 0x0000ff
                     
-                    self.sheet.range('D'+str(row)).value = body_data[index]['chat']
-                    self.sheet.range('E'+str(row)).value = body_data[index]['redp']
-                    self.sheet.range('F'+str(row)).value = body_data[index]['current_golds']
+                    self.sheets[-1].range('D'+str(row)).value = body_data[index]['chat']
+                    self.sheets[-1].range('E'+str(row)).value = body_data[index]['redp']
+                    self.sheets[-1].range('F'+str(row)).value = body_data[index]['current_golds']
                     # temp_num -= body_data[index]['current_golds']
                     index += 1
                 temp_num -= header_data['current_golds']
@@ -170,9 +168,9 @@ class WebSocketModel(QObject):
                 # 更新公式
                 tmp = "=0-SUM(F5:F"+str(index+5-1)+")+"+str(temp_num)
                 print("公式: %s" %tmp)
-                self.sheet.range('A1').formula=tmp
+                self.sheets[-1].range('A1').formula=tmp
                 if check_platform():
-                    self.sheet.range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
+                    self.sheets[-1].range('A5:'+'A'+str(index+5)).api.HorizontalAlignment = xw.constants.HAlign.xlHAlignCenter
             if c_data['call'] == 'sendMessage':
                 print(c_data['data'])
                 
@@ -183,12 +181,11 @@ class WebSocketModel(QObject):
         print(c_data['call'])
     
     def makeExcelData(self):
-        if self.sheet is None:
-            return ""
-        return {
-            "header": self.sheet.range("A1:G4").value,
-            "list": self.sheet.range("A5:G"+str(self.lastrow)).value,
-        }
+        if len(self.sheets) > 0:
+            return {
+                "header": self.sheets[-1].range("A1:G4").value,
+                "list": self.sheets[-1].range("A5:G"+str(self.lastrow-1)).value,
+            }
 
     def handle_message(self, message):
         sender = self.sender()
@@ -263,10 +260,14 @@ class Controller():
     
     def pushdata(self):
         self.logv("推送数据")
-        pdata = self.model.makeExcelData()
-        print(pdata)
-        message = {"code": 1, "call": "pushData", "data": pdata}
-        self.sendMessageAll(message)
+        if len(self.model.sheets) > 0:
+            pdata = self.model.makeExcelData()
+            print("推送数据")
+            print(pdata)
+            message = {"code": 1, "call": "pushData", "data": pdata}
+            self.sendMessageAll(message)
+        else:
+            self.logv("推送失败")
         
     def logv(self, msg):
         if self.logview is not None:
@@ -277,16 +278,22 @@ class Controller():
     def clearDataOne(self):
         self.logv("清空一把")
         message = {"code": 1, "call": "clearDataOne", "data": ""}
-        self.model.sheet.delete()
-        self.sendMessageAll(message)
+        if len(self.model.sheets) > 0:
+            self.model.sheets[-1].delete()
+            self.sendMessageAll(message)
+        else:
+            self.logv("清空失败")
 
     def clearDataAll(self):
         self.logv("清空所有")
-        message = {"code": 1, "call": "clearDataAll", "data": ""}
-        for sh in self.model.sheets:
-            if sh is not None:
-                sh.delete()
-        self.sendMessageAll(message)
+        if len(self.model.sheets) > 0:
+            message = {"code": 1, "call": "clearDataAll", "data": ""}
+            for sh in self.model.sheets:
+                if sh is not None:
+                    sh.delete()
+            self.sendMessageAll(message)
+        else:
+            self.logv("清空失败")
 
     def setLogView(self, view):
         self.logview = view
